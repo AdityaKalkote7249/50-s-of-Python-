@@ -1,0 +1,50 @@
+import tkinter as tk
+from tkinter.filedialog import askopenfile
+from docx2pdf import convert
+
+def convertFile():
+    if selected_file:
+        converted_filename = convert(selected_file.name)
+        if converted_filename:
+            result_label.config(text="File converted successfully: " + converted_filename.split('/')[-1])
+        else:
+            result_label.config(text="File converted successfully.")
+    else:
+        result_label.config(text="No file selected.")
+
+def openFile():
+    global selected_file
+    selected_file = askopenfile(filetypes=[('Word Files', '*.docx')])
+    if selected_file:
+        selected_filename = selected_file.name.split('/')[-1]  # Extracting only the filename without the path
+        selected_file_label.config(text=f"Selected File: {selected_filename}")
+    else:
+        selected_file_label.config(text="No file selected.")
+
+root = tk.Tk()
+root.title("File to pdf")
+root.config(bg="#88ab8e")
+root.resizable(False, False)
+root.geometry("600x400+100+200")
+
+title_label = tk.Label(root, text="Word file to PDF format", fg="black", bg="#f7efe5", font=("Arial", 20, "bold"))
+title_label.place(x=100, y=20)
+
+button_convert = tk.Button(root, text="Convert", fg="black", bg="#f7efe5", font=("Arial", 15, "bold"), command=convertFile)
+button_convert.place(x=300, y=150)
+
+button_select = tk.Button(root, text="Select", fg="black", bg="#f7efe5", font=("Arial", 15, "bold"), command=openFile)
+button_select.place(x=200, y=150)
+
+button_quit = tk.Button(root, text="Quit", fg="black", bg="#f7efe5", font=("Arial", 15, "bold"), command=root.destroy)
+button_quit.place(x=450, y=150)
+
+selected_file_label = tk.Label(root, text="", fg="black", bg="#88ab8e", font=("Arial", 12))
+selected_file_label.place(x=200, y=200)
+
+result_label = tk.Label(root, text="", fg="black", bg="#88ab8e", font=("Arial", 12))
+result_label.place(x=200, y=250)
+
+selected_file = None
+
+root.mainloop()
