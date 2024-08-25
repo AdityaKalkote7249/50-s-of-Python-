@@ -1,0 +1,89 @@
+import tkinter as tk
+import random
+
+def simulate_game():
+    computer_choice = random.choice(["Rock", "Paper", "Scissors"])
+    label_computer_choice.config(text="Computer: " + computer_choice)
+    result = determine_winner(label_player_choice.cget("text").split(": ")[1], computer_choice)
+    label_result.config(text="Result: " + result)
+    update_score(result)
+
+def user_choice(choice):
+    player_choice = choice
+    label_player_choice.config(text="Player: " + player_choice)
+    simulate_game()
+
+def determine_winner(user_choice, computer_choice):
+    if user_choice == computer_choice:
+        return "It's a tie!"
+    elif (user_choice == "Rock" and computer_choice == "Scissors") or \
+         (user_choice == "Paper" and computer_choice == "Rock") or \
+         (user_choice == "Scissors" and computer_choice == "Paper"):
+        return "You win!"
+    else:
+        return "Computer wins!"
+
+def update_score(result):
+    global user_score, computer_score
+    if result == "You win!":
+        user_score += 1
+    elif result == "Computer wins!":
+        computer_score += 1
+    score_label.config(text="Score: You {}  \n Computer {}".format(user_score, computer_score))
+
+def restart_game():
+    global user_score, computer_score
+    user_score = 0
+    computer_score = 0
+    score_label.config(text="Score: You {}  \n Computer {}".format(user_score, computer_score))
+    label_player_choice.config(text="Player: ")
+    label_computer_choice.config(text="Computer: ")
+    label_result.config(text="Result: ")
+
+root = tk.Tk()
+root.config(bg="#b983ff")
+root.resizable(False, False)
+root.geometry("600x600+100+200")
+root.title("Rock Paper Scissors ")
+
+stone_icon = "\u26B2"
+paper_icon = "\uF5CE"
+scissors_icon = "\u2702"
+
+title = tk.Label(root, text="Rock Paper Scissors", fg="black", bg="white", font=("Arial", 20, "bold"))
+title.place(x=170, y=20)
+
+label_player_choice = tk.Label(root, text="Player: ", fg="black", bg="white", font=("Arial", 15))
+label_player_choice.place(x=20, y=130)
+
+rock_button = tk.Button(root, text=stone_icon + " Rock", fg="black", bg="white", font=("Arial", 15),
+                        command=lambda: user_choice("Rock"))
+rock_button.place(x=20, y=170)
+
+paper_button = tk.Button(root, text=paper_icon + " Paper", fg="black", bg="white", font=("Arial", 15),
+                         command=lambda: user_choice("Paper"))
+paper_button.place(x=150, y=170)
+
+scissors_button = tk.Button(root, text=scissors_icon + " Scissors", fg="black", bg="white", font=("Arial", 15),
+                             command=lambda: user_choice("Scissors"))
+scissors_button.place(x=280, y=170)
+
+label_computer_choice = tk.Label(root, text="Computer: ", fg="black", bg="white", font=("Arial", 15))
+label_computer_choice.place(x=20, y=250)
+
+label_result = tk.Label(root, text="Result:-", fg="black", bg="white", font=("Arial", 15, "bold"))
+label_result.place(x=20, y=300)
+
+score_label = tk.Label(root, text="Score:-", fg="black", bg="white", font=("Arial", 15, "bold"))
+score_label.place(x=20, y=400)
+
+restart_button=tk.Button(root,text="Restart",fg="black",bg="white",font=("Arial",15,"bold"), command=restart_game)
+restart_button.place(x=400,y=400)
+
+quit_button=tk.Button(root,text="Quit",fg="black",bg="white",font=("Arial",15,"bold"), command=root.destroy)
+quit_button.place(x=500,y=400)
+
+user_score = 0
+computer_score = 0
+
+root.mainloop()
