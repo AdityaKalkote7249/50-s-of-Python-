@@ -1,0 +1,174 @@
+import tkinter as tk
+import random
+import os
+import time
+
+# ... [Keep your existing functions and global variables] ...
+def get_high_score():
+    """Function to get the high score from the file."""
+    if not os.path.exists('highscore.txt'):
+        return 0
+    with open('highscore.txt', 'r') as file:
+        score = file.readline()
+    return int(score) if score else 0
+
+def update_high_score(new_score):
+    """Function to update the high score in the file."""
+    with open('highscore.txt', 'w') as file:
+        file.write(str(new_score))
+def get_random_text():
+    """Function to get a random paragraph."""
+    return random.choice(texts)
+
+def update_text():
+    """Function to update the text label with a new random paragraph."""
+    new_text = get_random_text()
+    text_label.config(text=new_text)
+    paragraph_text.delete('1.0', tk.END)
+    global start_time
+    start_time = time.time()
+# Modify the submit_test function
+def submit_test():
+    global high_score
+    end_time = time.time()
+    time_taken = end_time - start_time
+    typed_text = paragraph_text.get('1.0', tk.END).strip()
+    word_count = len(typed_text.split())
+    wpm = round((word_count / time_taken) * 60)
+
+    # Updating the high score if necessary
+    if wpm > high_score:
+        high_score = wpm
+        update_high_score(high_score)
+
+    show_start_window(wpm)  # Show start window with new score
+
+# New function to show start window
+def show_start_window(new_score=None):
+    if new_score is not None:
+        result_label.config(text=f"Your Speed: {new_score} WPM")
+    hs_value_label.config(text=f"{high_score} WPM")
+    main_window.withdraw()
+    start_window.deiconify()
+
+
+def show_main_window():
+    global start_time
+    start_time = time.time()
+    update_timer()  # Start updating the timer
+    update_text()  # Get new text for typing test
+    paragraph_text.delete('1.0', tk.END)  # Clear the text area
+    start_window.withdraw()
+    main_window.deiconify()
+
+def update_timer():
+    global start_time
+    if start_time:
+        elapsed_time = time.time() - start_time
+        minutes = int(elapsed_time // 60)
+        seconds = int(elapsed_time % 60)
+        timer_label.config(text=f"Time: {minutes:02}:{seconds:02}")
+        main_window.after(1000, update_timer)
+
+texts = [
+    # Add your paragraphs here
+    "The Lottery by Shirley Jackson is a riveting short story set in a small town, known for its annual,"
+        "unconventional lottery. In this event, every town resident is required to participate. The process is simple yet"
+        "mysterious: names are drawn from pieces of paper, rather than the traditional method of a hat draw. Among these,"
+        "one piece is distinct, marked by a black spot, indicating the 'winner' of the lottery."
+        "This particular year, the lottery brings with it an unexpected twist. Jackson masterfully weaves suspense and"
+        "tension, leading the narrative to a stunning and shocking conclusion. The story is not only engrossing but"
+        "also offers an exceptional opportunity to enrich one's experience in language and literature.",
+
+        "Humanity's quest for exploring the cosmos has always been a source of inspiration and wonder. "
+        "The vastness of space, dotted with stars and galaxies, holds mysteries that have intrigued scientists and"
+        "astronomers for centuries. From the historic Apollo moon landings to the recent Mars rover missions,"
+        "each step into the unknown serves as a testament to human ingenuity and the relentless pursuit of knowledge."
+        "As we continue to reach beyond our planet, each discovery offers new insights into the workings of our universe.",
+
+        "In the heart of the Amazon rainforest, a diverse ecosystem thrives, playing a crucial role in global "
+        "environmental health. This vast green expanse is a haven for countless species of flora and fauna, "
+        "many of which are unique to its humid and vibrant landscape. However, the threat of deforestation looms large, "
+        "posing risks not only to the wildlife and indigenous communities but also to the planet's climate. "
+        "Efforts in conservation and sustainable practices are vital to preserving this natural wonder for future generations.",
+
+        "New York City, often hailed as a melting pot of cultures, offers a kaleidoscope of experiences shaped "
+        "by its diverse inhabitants. From the bustling streets of Chinatown to the vibrant murals of Little Italy, "
+        "each neighborhood tells a story of the people who have migrated from every corner of the globe. "
+        "This rich cultural tapestry not only enhances the city's dynamic character but also fosters an environment "
+        "of tolerance and understanding, making it a microcosm of global harmony.",
+
+        "The realm of technology is in a perpetual state of evolution, with each breakthrough pushing the boundaries"
+        "of what's possible. In Silicon Valley, the heartland of technological innovation, bright minds work tirelessly"
+        "to develop solutions that could transform everyday life. From cutting-edge artificial intelligence to"
+        "revolutionary sustainable energy sources, these advancements signal a future where technology"
+        "continues to enhance human capabilities and solve complex global challenges.",
+
+        "The art of cuisine is a celebration of flavors and traditions, a dance of spices and ingredients that "
+        "come together to create culinary masterpieces. In Italy, food is not just nourishment; it is an expression "
+        "of culture and history. From the hand-rolled pasta of Tuscany to the traditional pizza Napoletana, "
+        "each dish is a testament to the region's rich heritage and the love and care of those who prepare it. "
+        "Exploring Italian cuisine is like taking a journey through the country's soul, discovering the stories "
+        "and passion behind every bite."
+]
+
+# Initialize the start time
+start_time = None
+
+# Start window setup
+start_window = tk.Tk()
+start_window.geometry("500x300")
+start_window.title("Typing Speed Test - Start")
+
+# Main window setup
+main_window = tk.Tk()
+main_window.title("Typing Speed Test")
+main_window.geometry("800x600")  # Adjusted for better fit
+main_window.resizable(False, False)
+main_window.configure(bg="#eedd82")
+main_window.withdraw()  # Initially hide the main window
+
+# Start window widgets
+# ... [Keep the existing content for start window widgets]
+hs_label = tk.Label(start_window, text="Your previous score is:", font=("Arial", 15, "bold"))
+hs_label.pack(pady=10)
+
+high_score = get_high_score()
+hs_value_label = tk.Label(start_window, text=f"{high_score} WPM", font=("Arial", 15, "bold"))
+hs_value_label.pack()
+
+start_button = tk.Button(start_window, text="Start Test", command=show_main_window, font=("Arial", 15, "bold"))
+start_button.pack(pady=20)
+
+# Main window widgets
+frame1 = tk.Frame(main_window, bg="white", relief=tk.RIDGE, borderwidth=2)
+frame1.pack(pady=20)
+
+top_frame = tk.Frame(main_window, bg="#eedd82")  # New frame for the top section
+top_frame.pack(pady=10)
+
+title_label = tk.Label(frame1, text="Typing Speed Test", font=("Arial", 20, "bold"), fg="black")
+title_label.pack()
+
+timer_label = tk.Label(top_frame, text="Time: 00:00", font=("Arial", 15, "bold"), fg="black")
+timer_label.pack(side=tk.RIGHT, padx=20)
+
+submit_button = tk.Button(top_frame, text="Submit", font=("Arial", 15, "bold"), fg="black", command=submit_test)
+submit_button.pack(side=tk.RIGHT, padx=10)
+
+text_label = tk.Label(main_window, text=get_random_text(), font=("Arial", 12, "bold"), fg="black", justify=tk.LEFT, wraplength=700)
+text_label.pack(pady=20)
+
+text_label1 = tk.Label(main_window, text="Enter the above paragraph here:", font=("Arial", 12, "bold"), fg="black", justify=tk.LEFT)
+text_label1.pack(anchor='w', padx=20, pady=10)
+
+paragraph_text = tk.Text(main_window, font=("Arial", 12), width=80, height=20, borderwidth=2)  # Adjusted size
+paragraph_text.pack(padx=20, pady=10)
+
+
+
+result_label = tk.Label(main_window, text="", font=("Arial", 15, "bold"), fg="black")
+result_label.pack(pady=10)
+
+start_window.mainloop()
+main_window.mainloop()
