@@ -1,0 +1,34 @@
+import qrcode as qr
+import tkinter as tk 
+
+def generate_qr_code():
+    url = post_url.get()
+    if url:
+        img = qr.make(url)
+        img.save("generated_qr_code.png")
+        result_label.config(text="QR Code generated successfully!")
+    else:
+        result_label.config(text="Please enter a URL.")
+
+root=tk.Tk()
+root.geometry("500x300+100+200")
+root.resizable(False,False)
+root.config(bg="#cdfadb")
+root.title("QR Code Generator") 
+
+title=tk.Label(root,text="QR Code Generator",fg="black",bg="#cdfadb",font=("Arial",15,"bold"))
+title.place(x=150,y=20)
+
+enter_url=tk.Label(root,text="Enter your URL:-",fg="black",bg="#cdfadb",font=("Arial",15,"bold"))
+enter_url.place(x=20,y=120)
+
+post_url=tk.Entry(root,width=40)
+post_url.place(x=200,y=125)
+
+generate_button=tk.Button(root,text="Generate",fg="white",bg="black",font=("Arial",12,"bold"), command=generate_qr_code)
+generate_button.place(x=250,y=190)
+
+result_label = tk.Label(root, text="", fg="black", bg="#cdfadb", font=("Arial", 12))
+result_label.place(x=150, y=250)
+
+root.mainloop()
