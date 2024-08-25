@@ -1,0 +1,126 @@
+Note: In this file both backend and frontend logic is included:
+
+// HTML Form view code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us Form</title>
+    <style>
+        body {
+            background-color: #eeeadd;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #911F27;
+        }
+        .content {
+            background-color: #fff;
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #911F27;
+            font-size: 18px;
+        }
+        input[type="text"], textarea {
+            width: calc(100% - 22px);
+            padding: 8px 10px;
+            border: none;
+            border-bottom: 2px solid #911F27;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            resize: none; /* Disable resizing */
+            overflow: hidden; /* Hide overflow */
+        }
+        textarea {
+            height: 50px; /* Set initial height of textarea */
+            overflow: hidden; /* Hide overflow */
+        }
+        input[type="submit"] {
+            background-color: #911F27;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 140px;
+        }
+        input[type="submit"]:hover {
+            background-color: #751a20;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contact Us Form</h1>
+    <form action="/submit" method="post">
+        <div class="content">
+            <label for="Name">Name:</label>
+            <input type="text" id="name" name="name" required><br>
+            <label for="mob_num">Mobile number:</label>
+            <input type="text" id="mob_no" name="mob_no" required><br>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required><br>
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" required><br>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" required></textarea><br>
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+// Backend code to store data 
+import mysql.connector
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+# Connect to MySQL database
+mydb = mysql.connector.connect(
+    host="localhost",
+    port=3309,  # Specify the port number here
+    user="root",
+    password="pass123",
+    database="aditya_db",
+    auth_plugin='mysql_native_password'
+)
+
+@app.route('/')
+def index():
+    return render_template('20day.html')
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    name = request.form['name']
+    mob_no = request.form['mob_no']
+    email = request.form['email']
+    subject = request.form['subject']
+    message = request.form['message']
+
+    cur = mydb.cursor()
+    sql = "INSERT INTO contactus (name, mob_no, email, subject, message) VALUES (%s, %s, %s, %s, %s)"
+    val = (name, mob_no, email, subject, message)
+    cur.execute(sql, val)
+    mydb.commit()
+    cur.close()
+
+    return 'Data inserted successfully!'
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
