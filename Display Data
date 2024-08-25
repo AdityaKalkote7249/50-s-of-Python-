@@ -1,0 +1,171 @@
+//Note:In this file both frontend and backend logic is included:
+//HTML Form view
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>23day</title>
+    <style>
+        body{
+             background-color: bisque;
+             margin: 0;
+             padding: 0;
+             font-weight: 500;
+             font-family: cursive;
+             font-size: 20px;
+        }
+        .data{
+             background-color: white;
+             width: 400px;
+             height: 150px;
+             border: solid black 1px;
+             border-radius: 10px;
+            margin-left: 500px;
+            margin-top: 10px;
+        }
+        label{
+             padding:20px ;
+        }
+        .input-group{
+             margin-top: 20px;
+        }
+        .input-all{
+             margin-top: 20px;
+             margin-left: 120px;
+        }
+        input[type="text"]
+        {
+             margin-left: -20px;
+        }
+        table{
+             border:1px solid black;
+             margin-left: 520px;
+             margin-top: 20px;
+        }
+        th{
+            border: 1px solid black;
+        }
+        td{
+            border: 1px solid black;
+        }
+        input [type="submit"]
+        {
+             border-radius: 2px;
+             border: 2px solid black;
+             width: 20px;
+        }
+       
+    </style>
+
+</head>
+<body>
+
+<h1 align="center">Display data from tables using Python</h1>   
+<form action="/" method="post">
+    <div class="data">
+        <div class="input-group">
+            <label for="single">Single data:</label>
+            <input type="text" name="id" id="id" placeholder="I'd">
+            <input type="submit" name="show_single" value="Show"><br>
+        </div>
+      
+        <!-- Added name attribute for differentiation -->
+        <div class="input-all">
+            <input type="submit" name="show_all" value="Show Whole Data">
+            <input type="submit" name="clear_page" value="Clear">
+        </div>
+       
+    </div>
+   
+</form>  
+
+{% if student %}
+<table>
+    <tr>
+        <th>ID:</th><th> Name:</th><th> Marks:</th>
+    </tr>
+   <tr>
+    <td>{{ student[0] }}</td>
+    <td>{{ student[1] }}</td>
+    <td> {{ student[2] }}</td>
+   </tr>
+</table>
+
+{% elif students %}
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Marks</th>
+    </tr>
+    {% for s in students %}
+    <tr>
+        <td>{{ s[0] }}</td>
+        <td>{{ s[1] }}</td>
+        <td>{{ s[2] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% elif error %}
+<p>{{ error }}</p>
+{% endif %}
+
+</body>
+</html>
+
+
+
+
+//Backend logic
+
+from flask import Flask, render_template, request
+import mysql.connector
+
+app = Flask(__name__)
+
+# Database connection
+mydb = mysql.connector.connect(
+    host="YOUR_HOSTNAME",
+    port="YOUR_PORT",
+    user="",
+    password="",
+    database="YOUR_DATABASE",
+    auth_plugin='mysql_native_password'
+)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        if 'show_single' in request.form:
+            # Handle single data request
+            id = request.form['id']
+            cursor = mydb.cursor()
+            sql = "SELECT id, name, marks FROM student_data WHERE id = %s"
+            cursor.execute(sql, (id,))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                # Show single student data
+                return render_template('23day.html', student=result, students=None)
+            else:
+                # No record found
+                return render_template('23day.html', error="No record found for ID: " + id, students=None)
+        elif 'show_all' in request.form:
+            # Handle whole data request
+            cursor = mydb.cursor()
+            sql = "SELECT id, name, marks FROM student_data"
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            cursor.close()
+            if results:
+                # Show all students data
+                return render_template('23day.html', students=results, student=None)
+            else:
+                # No records found
+                return render_template('23day.html', error="No records found.", student=None)
+    # GET request or initial page load
+    return render_template('23day.html', student=None, students=None)
+
+if __name__ == '__main__':
+    app.run(debug=True)
