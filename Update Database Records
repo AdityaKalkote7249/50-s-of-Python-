@@ -1,0 +1,174 @@
+//Note:In this file both frontend and backend logic is included
+//HTML form view 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update data</title>
+    <style>
+        body{
+             background-color: bisque;
+             margin: 0;
+             padding: 0;
+             font-family: cursive;
+             font-weight: 500;
+             font-size: 20px;
+        }
+        .content{
+             background-color: white;
+             width: 300px;
+             height: 300px;
+             border: solid black 1px;
+             border-radius: 10px;
+             margin: 10px auto;
+             padding: 20px;
+             text-align: center; /* Center align content */
+        }
+        .input-row {
+            margin-bottom: 20px;
+            text-align: left; /* Left align labels */
+        }
+        .input-row label {
+            margin-right: 10px;
+        }
+        input[type="text"], input[type="submit"] {
+             width: calc(100% - 22px); /* Adjusting input width */
+             padding: 5px; /* Adding padding */
+             border: 1px solid black;
+             border-radius: 10px;
+              
+        }
+        input[type="submit"] {
+             margin-top: 10px;
+             width: 100px;
+        }
+        table{
+             border:1px solid black;
+             margin: 20px auto;
+        }
+        th, td{
+            border: 1px solid black;
+            padding: 5px;
+        }
+        p{
+             text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 align="center">Update your database</h1>
+    <form method="post">
+        <div class="content">
+            <div class="input-group">
+                <div class="input-row">
+                    <label for="id">ID:-</label>
+                    <input type="text" name="id" id="id" value="{{ row.id if row else '' }}" required>
+                </div>
+                <div class="input-row">
+                    <label for="name">Name:-</label>
+                    <input type="text" name="name" id="name" value="{{ row.name if row else '' }}">
+                </div>
+                <div class="input-row">
+                    <label for="marks">Marks:-</label>
+                    <input type="text" name="marks" id="marks" value="{{ row.marks if row else '' }}">
+                </div>
+                <input type="submit" name="action" value="Show">
+                <input type="submit" name="action" value="Update">
+                <input type="submit" value="Clear" name="clear_page">
+            </div>
+        </div>
+    </form>
+    
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+    <p> {% if row %} </p>
+   
+     
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Marks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.marks }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+</body>
+</html>
+
+
+
+
+// Backend logic
+
+from flask import Flask, render_template, request
+import mysql.connector
+
+app = Flask(__name__)
+
+# Establish MySQL connection
+mydb = mysql.connector.connect(
+    host="YOUR_HOST",
+    port="YOUR_PORT",
+    user="",
+    password="",
+    database="YOUR_DATABASE",
+    auth_plugin='mysql_native_password'
+)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    message = ''  # Initialize message variable
+    row = None  # Initialize row variable to hold data to display
+    if request.method == 'POST':
+        id = request.form.get('id')  # Get ID from form data
+        action = request.form.get('action')  # Get action from form data
+
+        if action == 'Show':
+            cursor = mydb.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM student_data WHERE id = %s", (id,))
+            row = cursor.fetchone()
+            if row:
+                message = ''
+            else:
+                message = 'No data found for ID.'
+            cursor.close()
+
+        elif action == 'Update':
+            name = request.form.get('name')
+            marks = request.form.get('marks')
+            cursor = mydb.cursor(dictionary=True)
+            update_stmt = "UPDATE student_data SET name = %s, marks = %s WHERE id = %s"
+            cursor.execute(update_stmt, (name, marks, id))
+            mydb.commit()
+            cursor.close()
+
+            # Fetch the updated data after updating
+            cursor = mydb.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM student_data WHERE id = %s", (id,))
+            row = cursor.fetchone()
+            if row:
+                message = 'Data updated successfully.'
+            else:
+                message = 'Update failed or no change made.'
+            cursor.close()
+
+        elif action == 'Clear':  # Handle the "Clear" button
+            # Clear the form fields
+            row = {'id': '', 'name': '', 'marks': ''}
+            message = 'Form cleared successfully.'
+
+    return render_template('24day.html', row=row, message=message)
+
+if __name__ == '__main__':
+    app.run(debug=True)
