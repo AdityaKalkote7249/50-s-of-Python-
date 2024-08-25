@@ -1,0 +1,182 @@
+// Note: In this file both forntend and backend logic is included
+// HTML form view
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration form</title>
+    <style>
+        .form {
+            background-color: #E5E1DA;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            /* Add some spacing between input groups */
+        }
+
+        .input-row {
+            display: flex;
+            /* Use flexbox to arrange label and input in a row */
+            align-items: center;
+            /* Align items vertically in the center */
+        }
+
+        .input-row label {
+            flex: 1;
+            /* Make labels take up equal space */
+            margin-right: 10px;
+            /* Add some spacing between labels */
+        }
+
+        .input-row input,
+        .input-row textarea {
+            flex: 2;
+            /* Make input fields take up more space */
+            padding: 8px;
+            /* Add some padding for better appearance */
+            border-radius: 5px;
+            /* Add rounded corners to inputs */
+            border: 1px solid #ccc;
+            /* Add a border for clarity */
+            width: calc(100% - 20px);
+            /* Calculate the width of inputs to leave space for margin */
+            margin-right: 10px;
+            /* Add some spacing between inputs */
+        }
+       
+          
+        /* Additional styling for gender radio buttons */
+        .gender-options {
+            margin-top: -45px;
+            margin-left: 316px;
+            /* Add some spacing between gender options */
+        }
+
+        .gender-options label {
+            display: block;
+            /* Display each gender option on a new line */
+            margin-top: 5px;
+            /* Add some spacing between options */
+        }
+    </style>
+</head>
+
+<body>
+    <form action="/submit" method="post">
+        <h1 align="center">Student Registration Form</h1>
+        <div class="form">
+            <label for="applicant">Name of the applicant:-</label><br>
+            <div class="input-group">
+                <div class="input-row">
+                    <label for="first_name">First name:-</label>
+                    <label for="last_name">Last name:-</label>
+                </div>
+                <div class="input-row">
+                    <input type="text" name="first_name" id="first_name" required>
+                    <input type="text" name="last_name" id="last_name" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label for="email">Email:-</label>
+                    <label for="phone_number">Phone Number:-</label>
+                </div>
+                <div class="input-row">
+                    <input type="text" name="email" id="email" required>
+                    <input type="number" name="phone_number" id="phone_number" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label for="dob">Date of birth:-</label>
+                    <label for="gender">Gender:-</label>
+                </div>
+                <div class="input">
+                    <input type="date" name="date" id="date" required>
+                    <div class="gender-options">
+                        <label for="male">Male<input type="radio" name="gender" id="male" value="Male"></label>
+                        
+                        <label for="female">Female <input type="radio" name="gender" id="female" value="Female"></label>
+                       
+                        <label for="others">Others   <input type="radio" name="gender" id="others" value="Others"></label>
+                     
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label for="address">Address:-</label>
+                </div>
+                <div class="input-row">
+                    <textarea id="address" name="address" required></textarea>
+                </div>
+            </div>
+
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+</body>
+
+</html>
+
+
+
+
+//Backend logic 
+import mysql.connector
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+mydb = mysql.connector.connect(
+    host="YOUR_HOSTNAME",
+    port="YOUR_PORT",
+    user="",
+    password="",
+    database="YOUR_DATABASE",
+    auth_plugin='mysql_native_password'
+)
+
+@app.route('/')
+def index():
+    return render_template('22day.html')
+
+@app.route('/submit', methods=['POST'])
+def submit_form():
+    try:
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        phone_number = request.form['phone_number']
+        email = request.form['email']
+        date = request.form['date']
+        
+        # Retrieve value from radio button for gender
+        gender = request.form.get('gender')
+        address = request.form['address']  # Corrected this line
+
+        # Assuming you have a MySQL database connection already established
+        mycursor = mydb.cursor()
+
+        # Insert the data into the database
+        sql = "INSERT INTO student_form (first_name, last_name, phone_number, email, date, gender, address) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        val = (first_name, last_name, phone_number, email, date, gender, address)
+        mycursor.execute(sql, val)
+        mydb.commit()
+
+        return 'Form submitted successfully!'
+    except mysql.connector.Error as err:
+        return f"Error: {err}"
+
+if __name__ == '__main__':
+    app.run(debug=True)
