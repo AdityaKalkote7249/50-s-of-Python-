@@ -1,0 +1,171 @@
+// Note: In this file both frontend and backend logic is included
+//HTML form view 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+         body {
+            background-color: #80bcbd;
+            font-family: cursive;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 10px;
+            color: black;
+        }
+        .container {
+            background-color: #E5E1DA;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            color: black;
+            font-size: 18px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="text"], 
+        input[type="number"], 
+        input[type="email"], 
+        input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: none;
+            border-bottom: 2px solid black;
+            font-size: 20px;
+            outline: none;
+            resize: none;
+            overflow: hidden;
+            background-color: #E5E1DA;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color:#80bcbd;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            color:black;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create your account here</h1>
+    <div class="container">
+        <div class="input-group">
+            <form id="signupForm" action="/submit" method="post" onsubmit="return validatePassword()">
+                <label for="first_name">First Name:</label>
+                <input type="text" name="first_name" id="first_name">
+                <label for="last_name">Last Name:</label>
+                <input type="text" name="last_name" id="last_name">
+        </div>
+        <div class="input-group">
+            <label for="number">Number:</label>
+            <input type="text" name="number" id="number">
+        </div>
+        <div class="input-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email">
+        </div>
+        <div class="input-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password">
+        </div>
+        <div class="input-group">
+            <label for="confirm_password">Confirm password:</label>
+            <input type="password" name="confirm_password" id="confirm_password">
+            <div id="passwordMismatch" class="error-message" style="display: none;">Passwords do not match</div>
+        </div>
+        <input type="submit" value="Create">
+        </form>
+    </div>
+
+    <script>
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirm_password").value;
+            var errorDiv = document.getElementById("passwordMismatch");
+
+            if (password !== confirmPassword) {
+                errorDiv.style.display = "block";
+                return false; // Prevent form submission
+            } else {
+                errorDiv.style.display = "none";
+                return true; // Allow form submission
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+// Backend logic 
+import mysql.connector
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+mydb = mysql.connector.connect(
+    host="YOUR_HOSTNAME",
+    port="YOUR_PORT",
+    user="root",
+    password="",
+    database="YOUR_DATABASE",
+    auth_plugin='mysql_native_password'
+)
+
+@app.route('/')
+def index():
+    return render_template('21day_signup.html')
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    number = request.form['number']
+    email = request.form['email']
+    password = request.form['password']
+    confirm_password = request.form['confirm_password']
+
+    cur = mydb.cursor()
+
+    # Check if user already has an account
+    cur.execute("SELECT * FROM sign_up WHERE email = %s", (email,))
+    existing_user = cur.fetchone()
+
+    if existing_user:
+        return 'You already have an account!'
+
+    # Insert data if user doesn't have an account
+    sql = "INSERT INTO sign_up(first_name, last_name, number, email, password, confirm_password) VALUES (%s, %s, %s, %s, %s, %s)"
+    val = (first_name, last_name, number, email, password, confirm_password)
+    cur.execute(sql, val)
+    mydb.commit()
+    cur.close()
+
+    return 'Account created succesfully!'
+
+if __name__ == '__main__':
+    app.run(debug=True)
