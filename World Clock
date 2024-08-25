@@ -1,0 +1,83 @@
+import tkinter as tk 
+from datetime import datetime
+from tkinter import *
+import pytz
+
+# Function to update time for a specific country
+def update_time(country_name, timezone, country_label, clock_label):
+    home = pytz.timezone(timezone)
+    local_time = datetime.now(home)
+    current_time = local_time.strftime("%A: %H:%M:%S")  # Add %A for day of the week
+    clock_label.config(text=current_time)
+    country_label.config(text=country_name)
+    root.after(200, update_time, country_name, timezone, country_label, clock_label)
+
+# Main window setup
+root = tk.Tk()
+root.geometry("1200x400")
+root.resizable(False, False)
+root.config(bg="#fdfdbd")
+root.title("World Clock")
+
+title = Label(root, text="World clock", fg="black", bg="white", font=("Arial", 40, "bold"))
+title.place(x=470, y=20)
+
+# Clock icon label
+clock_icon_label = Label(root, text="\u23F0", font=("Arial", 40),fg="black",bg="#fdfdbd")
+clock_icon_label.place(x=580, y=110)
+
+# Frame setup
+frame1 = Frame(root, bd=5, bg="#fa7070")
+frame1.place(x=30, y=200, width=200, height=100)
+
+frame2 = Frame(root, bd=5, bg="#c3f8ff")
+frame2.place(x=270, y=200, width=200, height=100)
+
+frame3 = Frame(root, bd=5, bg="#7fb77e")
+frame3.place(x=510, y=200, width=200, height=100)
+
+frame4 = Frame(root, bd=5, bg="#00ffab")
+frame4.place(x=740, y=200, width=200, height=100)
+
+frame5 = Frame(root, bd=5, bg="#5e454b")
+frame5.place(x=970, y=200, width=200, height=100)
+
+# Labels for displaying time and location
+country_label1 = Label(frame1, font=("Arial", 15, "bold"), bg="#fa7070")
+country_label1.place(x=50, y=10)
+
+clock_label1 = Label(frame1, font=("Arial", 15, "bold"), bg="#fa7070")
+clock_label1.place(x=5, y=50)
+
+country_label2 = Label(frame2, font=("Arial", 15, "bold"), bg="#c3f8ff")
+country_label2.place(x=50, y=10)
+
+clock_label2 = Label(frame2, font=("Arial", 15, "bold"), bg="#c3f8ff")
+clock_label2.place(x=5, y=50)
+
+country_label3 = Label(frame3, font=("Arial", 15, "bold"), bg="#7fb77e")
+country_label3.place(x=50, y=10)
+
+clock_label3 = Label(frame3, font=("Arial", 15, "bold"), bg="#7fb77e")
+clock_label3.place(x=5, y=50)
+
+country_label4 = Label(frame4, font=("Arial", 15, "bold"), bg="#00ffab")
+country_label4.place(x=50, y=10)
+
+clock_label4 = Label(frame4, font=("Arial", 15, "bold"), bg="#00ffab")
+clock_label4.place(x=5, y=50)
+
+country_label5 = Label(frame5, font=("Arial", 15, "bold"), bg="#5e454b")
+country_label5.place(x=50, y=10)
+
+clock_label5 = Label(frame5, font=("Arial", 15, "bold"), bg="#5e454b")
+clock_label5.place(x=5, y=50)
+
+# Call the update_time function for each country
+update_time("India", "Asia/Kolkata", country_label1, clock_label1)
+update_time("USA", "America/New_York", country_label2, clock_label2)
+update_time("Japan", "Asia/Tokyo", country_label3, clock_label3)
+update_time("Germany", "Europe/Berlin", country_label4, clock_label4)
+update_time("Australia", "Australia/Sydney", country_label5, clock_label5)
+
+root.mainloop()
