@@ -1,0 +1,57 @@
+import tkinter as tk
+import random
+
+class OTPGenerator:
+    def __init__(self, master):
+        self.master = master
+        self.master.geometry("600x300+100+200")
+        self.master.resizable(False, False)
+        self.master.config(bg="#cbffa9")
+        self.master.title("OTP generator")
+        
+        self.title = tk.Label(master, text=" OTP generator",fg="black",bg="white",font=("Arial",15,"bold"))
+        self.title.pack( pady=20,padx=10)
+
+
+        self.next_button = tk.Button(master, text="Generate OTP", command=self.generate_otp,fg="black",bg="white",font=("Arial",15,"bold"))
+        self.next_button.place(x=50,y=150)
+
+        self.send_button = tk.Button(master, text="Send", command=self.send_otp,fg="black",bg="white",font=("Arial",15,"bold"))
+        self.send_button.place(x=280,y=150)
+
+        self.quit_button = tk.Button(master, text="Quit", command=self.quit_app,fg="black",bg="white",font=("Arial",15,"bold"))
+        self.quit_button.place(x=500,y=150)
+
+        self.otp_label = tk.Label(master, text="Your OTP:", fg="black", bg="#cbffa9", font=("Arial", 15, "bold"))
+        self.otp_label.place(y=70,x=250)
+
+
+        self.otp_value = tk.StringVar()
+        self.otp_result = tk.Label(master, textvariable=self.otp_value, font=("Arial", 18),fg="black", bg="#cbffa9")
+        self.otp_result.place(y=100,x=270)
+
+    def generate_otp(self):
+        otp = ''.join(random.choices('0123456789', k=6))
+        self.otp_value.set(otp)
+
+    def send_otp(self):
+     self.send_button.place_forget()  # Hide the Send button
+     self.next_button.place_forget()  # Hide the Next OTP button
+     self.otp_label.place_forget()    # Hide the OTP label
+     self.otp_result.place_forget()   # Hide the OTP result
+    # Now, display the success message
+     self.message_label = tk.Label(self.master, text="OTP sent successfully!", fg="black", bg="#cbffa9", font=("Arial", 15, "bold"))
+     self.message_label.place(x=200, y=200)  # Adjust positioning as needed
+
+
+    def quit_app(self):
+        self.master.destroy()
+
+def main():
+    root = tk.Tk()
+    app = OTPGenerator(root)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
+ 
