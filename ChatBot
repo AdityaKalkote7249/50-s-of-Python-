@@ -1,0 +1,73 @@
+import tkinter as tk
+from tkinter import scrolledtext
+from datetime import datetime
+
+# Define responses for the chatbot
+responses = {
+    "hi": "Hello!",
+    "how are you": "I'm doing well, what about you?",
+    "i am also fine": "Great! How can I help you?",
+    "what is your name": "My name is Aditya's ChatBot.",
+    "what is your version": "My version is 2.0",
+    "bye": "Goodbye! Have a great day!"
+}
+
+# Function to get response from the chatbot
+def get_response(message):
+    message = message.lower()
+    return responses.get(message, "I'm sorry, I don't understand that.")
+
+# Function to get greeting based on the time of the day
+def get_greeting():
+    current_time = datetime.now()
+    hour = current_time.hour
+    if 6 <= hour < 12:
+        return "Good morning!"
+    elif 12 <= hour < 18:
+        return "Good afternoon!"
+    elif 18 <= hour < 22:
+        return "Good evening!"
+    else:
+        return "Hello!"
+
+# Function to handle sending messages and displaying responses
+def send_message():
+    message = entry.get()
+    if message.strip() != "":
+        conversation.config(state=tk.NORMAL)
+        conversation.insert(tk.END, "You: " + message + "\n", "user")
+        conversation.insert(tk.END, "ChatBot: " + get_response(message) + "\n\n", "bot")
+        conversation.config(state=tk.DISABLED)
+        entry.delete(0, tk.END)
+
+# Create the main window
+root = tk.Tk()
+root.title("ChatBot")
+root.geometry("500x500+100+200")
+root.config(bg="#ff7f50")
+root.resizable(False, False)
+
+# Create a label for the title
+title = tk.Label(root, text="Aditya's ChatBot", fg="black", bg="white", font=("Arial", 15, "bold"))
+title.place(x=150, y=20)
+
+# Create a scrolled text widget to display the conversation
+conversation = scrolledtext.ScrolledText(root, width=40, height=20, bg="#efe3d0")
+conversation.place(x=70, y=90)
+conversation.tag_config("user", foreground="#e16428")
+conversation.tag_config("bot", foreground="#7cb855")
+
+# Create an entry widget for typing messages
+entry = tk.Entry(root, width=40, bg="#ff7f50")
+entry.place(x=80, y=380)
+
+# Create a button to send messages
+send_button = tk.Button(root, text="Send", command=send_message, fg="black", bg="#00ad7c", font=("Arial", 12), width=5)
+send_button.place(x=330, y=370)
+
+# Print greeting message
+greeting = get_greeting()
+conversation.insert(tk.END, "ChatBot: " + greeting + "\n\n", "bot")
+
+# Start the GUI event loop
+root.mainloop()
