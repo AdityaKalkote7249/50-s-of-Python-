@@ -1,0 +1,107 @@
+import tkinter as tk
+from tkinter import *
+from tkinter.ttk import Combobox
+import pyttsx3
+import os
+from tkinter import filedialog
+
+root = tk.Tk()
+root.title("Text to speech")
+root.config(bg="#d6d46d")
+root.geometry("600x600+100+200")
+root.resizable(False, False)
+
+engine = pyttsx3.init()
+
+def speech():
+    text = text_input.get(1.0, END)
+    voice = voice_choosen.get()
+    speed = speed_choosen.get()
+    voices = engine.getProperty('voices')
+
+    def setvoice():
+        if voice == 'Male':
+            engine.setProperty('voice', voices[0].id)
+            engine.say(text)
+            engine.runAndWait()
+        else:
+            engine.setProperty('voice', voices[1].id)
+            engine.say(text)
+            engine.runAndWait()
+
+    if text:
+        if speed == "Fast":
+            engine.setProperty('rate', 250)
+            setvoice()
+        elif speed == "Normal":
+            engine.setProperty('rate', 170)
+            setvoice()
+        else:
+            engine.setProperty('rate', 50)
+            setvoice()
+
+def save():
+    text = text_input.get(1.0, END)
+    voice = voice_choosen.get()
+    speed = speed_choosen.get()
+    voices = engine.getProperty('voices')
+
+    def setvoice():
+        if voice == 'Male':
+            engine.setProperty('voice', voices[0].id)
+            path = filedialog.askdirectory()
+            os.chdir(path)
+            engine.save_to_file(text, 'text.mp3')
+            engine.runAndWait()
+        else:
+            engine.setProperty('voice', voices[1].id)
+            path = filedialog.askdirectory()
+            os.chdir(path)
+            engine.save_to_file(text, 'text.mp3')      
+            engine.runAndWait()
+
+    if text:
+        if speed == "Fast":
+            engine.setProperty('rate', 250)
+            setvoice()
+        elif speed == "Normal":
+            engine.setProperty('rate', 170)
+            setvoice()
+        else:
+            engine.setProperty('rate', 50)
+            setvoice()
+
+title_label = tk.Label(root, text="Text speech", fg="white", bg="black", font=("Arial", 30, "bold"))
+title_label.place(x=180, y=40)
+
+text_input = tk.Text(root, font=("Arial", 15, "bold"))
+text_input.place(x=20, y=200, height=350, width=350)
+
+dropdown_label = tk.Label(root, text="Voice", fg="black", bg="#d6d46d", font=("Arial", 15, "bold"))
+dropdown_label.place(x=400, y=200)
+
+dropdown1_label = tk.Label(root, text="Speed", fg="black", bg="#d6d46d", font=("Arial", 15, "bold"))
+dropdown1_label.place(x=500, y=200)
+
+voice_choosen = tk.StringVar() 
+voicechoosen = Combobox(root, width=10, textvariable=voice_choosen, state="readonly") 
+voicechoosen['values'] = ('Male','Female') 
+voicechoosen.place(x=380, y=230)
+voicechoosen.current(0)
+
+speed_choosen = tk.StringVar() 
+speedchoosen = Combobox(root, width=10, textvariable=speed_choosen, state="readonly") 
+speedchoosen['values'] = ('Slow','Normal','Fast') 
+speedchoosen.place(x=500, y=230)
+speedchoosen.current(0)
+
+speech_button = tk.Button(root, text="Speech", font=("Arial", 12, "bold"), fg="black", bg="#40a2e3", command=speech)
+speech_button.place(x=380, y=280, height=30, width=65)
+
+save_button = tk.Button(root, text="Save", fg="black", bg="#fc6736", font=("Arial", 12, "bold"), command=save)
+save_button.place(x=500, y=280, height=30, width=60)
+
+quit_button = tk.Button(root, text="Quit", fg="black", bg="white", font=("Arial", 12, "bold"), command=root.destroy)
+quit_button.place(x=450, y=340, height=30, width=60)
+
+root.mainloop()
