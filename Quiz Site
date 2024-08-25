@@ -1,0 +1,114 @@
+import tkinter as tk
+import random
+
+class QuizApp(tk.Tk):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.geometry("900x500+100+200")
+        self.resizable(False, False)
+        self.config(bg="#cbffa9")
+        self.title("Choose, Check and Score")
+
+        self.questions = [
+           
+    {"text": "1) What symbol is used for assignment in most programming languages?", "options": ["a) =", "b) ==", "c) :", "d) ->"], "correct_answer": "a) ="},
+    {"text": "2) What does HTML stand for?", "options": ["a) Hyper Text Markup Language", "b) Hyperlinks and Text Markup Language", "c) Home Tool Markup Language", "d) Hyperlinks and Text Makeup Language"], "correct_answer": "a) Hyper Text Markup Language"},
+    {"text": "3) What does CSS stand for?", "options": ["a) Creative Style Sheets", "b) Cascading Style Sheets", "c) Computer Style Sheets", "d) Colorful Style Sheets"], "correct_answer": "b) Cascading Style Sheets"},
+    {"text": "4) What symbol is used to start a single-line comment in Python?", "options": ["a) #", "b) //", "c) *", "d) /**/"], "correct_answer": "a) #"},
+    {"text": "5) Which of the following is not a programming language?", "options": ["a) Python", "b) Java", "c) HTML", "d) CSS"], "correct_answer": "c) HTML"},
+    {"text": "6) What does JSON stand for?", "options": ["a) JavaScript Object Notation", "b) JavaScript Object Naming", "c) JavaScript Oriented Notation", "d) JavaScript Object Network"], "correct_answer": "a) JavaScript Object Notation"},
+    {"text": "7) What does SQL stand for?", "options": ["a) Simple Query Language", "b) Structured Query Language", "c) Sequential Query Language", "d) Standard Query Language"], "correct_answer": "b) Structured Query Language"},
+    {"text": "8) What does JVM stand for?", "options": ["a) Java Virtual Machine", "b) Just Virtual Machine", "c) Java Virtual Memory", "d) Just Virtual Memory"], "correct_answer": "a) Java Virtual Machine"},
+    {"text": "9) What symbol is used for string concatenation in JavaScript?", "options": ["a) +", "b) &", "c) *", "d) /"], "correct_answer": "a) +"},
+    {"text": "10) What does API stand for?", "options": ["a) Application Programming Interface", "b) Advanced Programming Interface", "c) Automated Programming Interface", "d) Application Protocol Interface"], "correct_answer": "a) Application Programming Interface"},
+    {"text": "11) Which programming language is often used for web development?", "options": ["a) Java", "b) Python", "c) PHP", "d) All of the above"], "correct_answer": "c) PHP"},
+    {"text": "12) Which of the following is a dynamically typed programming language?", "options": ["a) Java", "b) C", "c) Python", "d) C++"], "correct_answer": "c) Python"},
+    {"text": "13) What does IDE stand for?", "options": ["a) Integrated Development Environment", "b) Integrated Developer Environment", "c) Interactive Development Environment", "d) Internet Development Environment"], "correct_answer": "a) Integrated Development Environment"},
+    {"text": "14) Which programming language is known for its use in machine learning and data science?", "options": ["a) Java", "b) Python", "c) C++", "d) Ruby"], "correct_answer": "b) Python"},
+    {"text": "15) Which of the following is not a JavaScript framework?", "options": ["a) React", "b) Angular", "c) Django", "d) Vue.js"], "correct_answer": "c) Django"},
+    {"text": "16) Which programming language is often used for game development?", "options": ["a) Python", "b) Java", "c) C#", "d) All of the above"], "correct_answer": "d) All of the above"},
+    {"text": "17) What does URL stand for?", "options": ["a) Universal Resource Locator", "b) Uniform Resource Locator", "c) Universal Reference Locator", "d) Uniform Reference Locator"], "correct_answer": "b) Uniform Resource Locator"},
+    {"text": "18) Which programming language is often used for system programming?", "options": ["a) Python", "b) C", "c) JavaScript", "d) PHP"], "correct_answer": "b) C"},
+    {"text": "19) Which of the following is a statically typed programming language?", "options": ["a) Python", "b) JavaScript", "c) C++", "d) Ruby"], "correct_answer": "c) C++"},
+    {"text": "20) What symbol is used to denote a pointer in C++?", "options": ["a) .", "b) &", "c) ->", "d) ::"], "correct_answer": "b) &"}
+
+
+        ]
+
+        self.current_question_index = 0
+        self.user_answers = [None] * len(self.questions)
+
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.question_label = tk.Label(self, text="", fg="black", bg="#cbffa9", font=("Arial", 15))
+        self.question_label.place(x=150, y=150)
+
+        self.radio_var = tk.IntVar(value=-1)  # Default value indicating no choice has been made
+        self.option_radios = []
+        y_pos = 200
+        for i in range(4):
+            radio = tk.Radiobutton(self, text="", variable=self.radio_var, value=i, bg="#cbffa9", font=("Arial", 12))
+            radio.place(x=150, y=y_pos)
+            self.option_radios.append(radio)
+            y_pos += 40
+        title=tk.Label(self,text="Choose, Submit and Score",fg="black",bg="#cbffa9",font=("Arial",15,"bold"))
+        title.place(x=300,y=20)
+        self.previous_button = tk.Button(self, text="Previous", fg="black", bg="#fd8a8a", font=("Arial", 15, "bold"), command=self.show_previous_question)
+        self.previous_button.place(x=200, y=400)
+
+        self.check_button = tk.Button(self, text="Submit", fg="black", bg="#faab78", font=("Arial", 15, "bold"), command=self.show_result)
+        self.check_button.place(x=400, y=400)
+
+        self.next_button = tk.Button(self, text="Next", fg="black", bg="#75e9de", font=("Arial", 15, "bold"), command=self.show_next_question)
+        self.next_button.place(x=600, y=400)
+
+        self.result_label = tk.Label(self, text="", fg="black", bg="#cbffa9", font=("Arial", 15))
+        self.result_label.place(x=400, y=250)
+
+        self.show_question()
+
+    def show_question(self):
+        self.radio_var.set(-1)  # Reset selection for new question
+        question = self.questions[self.current_question_index]
+        self.question_label.config(text=question["text"])
+        for i, option_text in enumerate(question["options"]):
+            self.option_radios[i].config(text=option_text)
+
+        if self.user_answers[self.current_question_index] is not None:
+            self.radio_var.set(self.user_answers[self.current_question_index])
+
+    def show_next_question(self):
+        self.save_answer()
+        if self.current_question_index < len(self.questions) - 1:
+            self.current_question_index += 1
+            self.show_question()
+
+    def show_previous_question(self):
+        self.save_answer()
+        if self.current_question_index > 0:
+            self.current_question_index -= 1
+            self.show_question()
+
+    def save_answer(self):
+        # Save the current selection
+        self.user_answers[self.current_question_index] = self.radio_var.get()
+
+    def show_result(self):
+        self.save_answer()  # Ensure the current selection is saved before checking
+        correct_count = sum(1 for answer, question in zip(self.user_answers, self.questions) if answer is not None and question["options"][answer] == question["correct_answer"])
+        total_questions = len(self.questions)
+        score_text = f"Your final score is: {correct_count} out of {total_questions}"
+        self.result_label.config(text=score_text)
+
+        # Hide questions and buttons
+        self.question_label.place_forget()
+        for radio in self.option_radios:
+            radio.place_forget()
+        self.previous_button.place_forget()
+        self.check_button.place_forget()
+        self.next_button.place_forget()
+
+if __name__ == "__main__":
+    app = QuizApp()
+    app.mainloop()
