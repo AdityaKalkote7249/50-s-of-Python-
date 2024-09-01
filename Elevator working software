@@ -1,0 +1,374 @@
+//Note:In this file both frontend and backend logic is included
+//HTML form view 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevator GUI</title>
+    <style>
+        /* Styles remain the same as provided */
+
+        /* Additional style for message box */
+      
+        #elevator {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            background-color: black;
+            /*transition: transform 0.5s ease; /* Smooth transition for elevator movement */
+            margin-left: 500px;
+            margin-top: 5px;
+        }
+        .door {
+            position: absolute;
+            top: 0;
+            right: 0; /* Change to open to the right */
+            width: 0;
+            height: 100%;
+            background-color: #808080;
+            transition: width 0.5s ease; /* Smooth transition for door opening/closing */
+        }
+        .open {
+            width: 50%; /* Adjust width to open fully to the right */
+        }
+        #floor-buttons {
+            margin-top: 20px;
+        }
+        .building{
+            width:80px;
+            height: 550px;
+            
+            margin-top:10px; 
+            position: fixed;
+            margin-left: 400px;
+            margin-top: -1px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        button{
+            border-radius: 100%;
+            border: none;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            margin-bottom: 28px;
+            margin-left: 8px;   
+            background-color: brown;
+            color: white;
+            font-size: 15px;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        .column{
+            width:80px;
+            height: 550px;
+            
+            margin-top:10px; 
+            position: fixed;
+            margin-left: 900px;
+            margin-top: -1px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        .column-top{
+            width: 578px;
+            height: 50px;
+            margin-left: 400px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        h1{
+            margin-top: 20px;
+            font-size: 20px;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        #elevator-display {
+            position: relative;
+            margin-top: 20px;
+        }
+        #elevator-arrow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            display: block;
+        }
+        .hide {
+            display: none;
+        }
+        #floor-buttons {
+            margin-top: 20px;
+        }
+        .building{
+            width:80px;
+            height: 550px;
+            
+            margin-top:10px; 
+            position: fixed;
+            margin-left: 400px;
+            margin-top: -1px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        button{
+            border-radius: 100%;
+            border: none;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            margin-bottom: 28px;
+            margin-left: 8px;   
+            background-color: brown;
+            color: white;
+            font-size: 15px;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        .column{
+            width:80px;
+            height: 550px;
+            
+            margin-top:10px; 
+            position: fixed;
+            margin-left: 900px;
+            margin-top: -1px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        .column-top{
+            width: 578px;
+            height: 50px;
+            margin-left: 400px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        h1{
+            margin-top: 20px;
+            font-size: 20px;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        #elevator-display {
+            position: relative;
+            margin-top: 20px;
+        }
+        #elevator-arrow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            display: block;
+        }
+        .hide {
+            display: none;
+        }
+        .building{
+            width:80px;
+            height: 550px;
+            
+            margin-top:10px; 
+            position: fixed;
+            margin-left: 400px;
+            margin-top: -1px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        button{
+            border-radius: 100%;
+            border: none;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            margin-bottom: 28px;
+            margin-left: 8px;   
+            background-color: brown;
+            color: white;
+            font-size: 15px;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        .column{
+            width:80px;
+            height: 550px;
+            
+            margin-top:10px; 
+            position: fixed;
+            margin-left: 900px;
+            margin-top: -1px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        .column-top{
+            width: 578px;
+            height: 50px;
+            margin-left: 400px;
+            border-radius: 10px;
+            border: 1px solid black;
+        }
+        h1{
+            margin-top: 20px;
+            font-size: 20px;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        #elevator-display {
+            position: relative;
+            margin-top: 20px;
+        }
+        #elevator-arrow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="column-top">
+        <h1 align="center">Working Of Elevator</h1>
+    </div>
+    <div class="building">
+        <div id="floor-buttons">
+            <button onclick="requestFloor('G')">Floor 5</button>
+            <button onclick="requestFloor(1)">Floor 4</button>
+            <button onclick="requestFloor(2)">Floor 3</button>
+            <button onclick="requestFloor(3)">Floor 2</button>
+            <button onclick="requestFloor(4)">Floor 1</button>
+            <button onclick="requestFloor(5)">Ground</button>
+        </div>
+    </div>
+    <div class="column"></div>
+    <div id="elevator-display">
+        <div id="elevator">
+            <div class="door"></div> <!-- Door element -->
+            <div id="elevator-arrow"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentFloor = "G"; // Initial floor
+        const floorHeight = 100; // Height of each floor in pixels
+        const elevatorSpeed = 100; // Speed of elevator movement in milliseconds
+
+        function moveElevator(targetFloor) {
+            const elevator = document.getElementById('elevator');
+            const arrow = document.getElementById('elevator-arrow');
+            const floors = ["G", 1, 2, 3, 4, 5]; // Define all floors
+
+            const currentFloorIndex = floors.indexOf(currentFloor);
+            const targetFloorIndex = floors.indexOf(targetFloor);
+            const direction = currentFloorIndex < targetFloorIndex ? 1 : -1; // Determine direction
+
+            if (currentFloor !== targetFloor) {
+                const targetPosition = targetFloorIndex * floorHeight; // Calculate target position based on target floor
+
+                // Move the elevator gradually
+                let currentPosition = currentFloorIndex * floorHeight;
+                const distance = Math.abs(targetPosition - currentPosition);
+                const duration = distance / floorHeight * elevatorSpeed;
+                const step = floorHeight * direction / duration;
+
+                function moveStep() {
+                    currentPosition += step;
+                    elevator.style.transform = `translateY(${currentPosition}px)`;
+
+                    if ((direction === 1 && currentPosition < targetPosition) || (direction === -1 && currentPosition > targetPosition)) {
+                        setTimeout(moveStep, 1);
+                    } else {
+                        currentFloor = targetFloor; // Update current floor
+
+                        // Open the door after 5 seconds
+                        setTimeout(openDoor, 5000);
+
+                        // Hide arrow when door is opening
+                        arrow.classList.add('hide');
+
+                        // Speak message when the elevator reaches a floor
+                        speakMessage(`Door is opening`);
+                    }
+                }
+
+                moveStep();
+            }
+        }
+
+        // Function to open the door
+        function openDoor() {
+            const door = document.querySelector('.door');
+            door.classList.add('open');
+            // Close the door after 5 seconds
+            setTimeout(closeDoor, 5000);
+        }
+
+        // Function to close the door
+        function closeDoor() {
+            const door = document.querySelector('.door');
+            door.classList.remove('open');
+            // Show arrow when door is closed
+            document.getElementById('elevator-arrow').classList.remove('hide');
+            // Speak message when the door is closed
+            speakMessage('Door is closed');
+        }
+
+        function requestFloor(floor) {
+            if (floor !== currentFloor) {
+                moveElevator(floor);
+            }
+        }
+
+        // Function to speak a message
+        function speakMessage(message) {
+            const msg = new SpeechSynthesisUtterance(message);
+            window.speechSynthesis.speak(msg);
+        }
+    </script>
+</body>
+</html>
+// Backend logic 
+from flask import Flask, render_template, request
+import time
+
+app = Flask(__name__)
+
+current_floor = "G"  # Initial floor
+floor_height = 100  # Height of each floor in pixels
+elevator_speed = 0.1  # Speed of elevator movement in seconds
+
+@app.route('/')
+def index():
+    return render_template('HTML FORM VIEW LINK')
+
+@app.route('/move_elevator', methods=['POST'])
+def move_elevator():
+    global current_floor
+
+    target_floor = request.form['floor']
+    current_floor_index = ["G", 1, 2, 3, 4, 5].index(current_floor)
+    target_floor_index = int(target_floor)
+    direction = 1 if current_floor_index < target_floor_index else -1
+
+    if current_floor != target_floor:
+        target_position = target_floor_index * floor_height
+
+        # Move the elevator gradually
+        current_position = current_floor_index * floor_height
+        distance = abs(target_position - current_position)
+        duration = distance * elevator_speed
+        step = (floor_height * direction) / duration
+
+        while (direction == 1 and current_position < target_position) or (direction == -1 and current_position > target_position):
+            current_position += step
+            time.sleep(elevator_speed)
+
+        current_floor = target_floor
+        return 'Success'  # Return a response after moving the elevator
+
+    return 'Already at the requested floor'  # If the elevator is already at the requested floor
+
+if __name__ == '__main__':
+    app.run(debug=True)
