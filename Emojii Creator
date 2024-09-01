@@ -1,0 +1,119 @@
+//Note:In this file both frontend and backend logic is included
+//HTML form view 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Art</title>
+    <style>
+        body{
+            background-color:burlywood;
+        }
+        pre{
+             color:black;
+            
+        }
+        .result{
+            width: 60%;
+             height: 110px;
+             border-radius: 5px;
+             border: 2px solid black;
+             margin-left: 250px;
+             margin-top: 60px;
+             overflow: auto;
+        }
+        .container{
+             width: 60%;
+             height: 110px;
+             border-radius: 5px;
+             border: 2px solid black;
+             margin-left: 250px;
+             margin-top: 50px;
+        }
+        .group{
+            margin-left: 200px;
+            padding:20px;
+        }
+        label{
+             color:black;
+             font-size: 25px;
+             font-family: sans-serif;
+             font-weight: 500;
+        }
+        input{
+             border: none;
+             border-bottom: 2px solid black;
+             width: 300px;
+             background-color: burlywood;
+        }
+        button{
+             width: 200px;
+             height: 30px;
+             font-size: 20px;
+             font-family: sans-serif;
+             font-weight: 500;
+             border: none;
+             border-radius: 5px;
+             margin-left: 300px;
+            cursor: pointer;
+            transition: all 2s;
+        }
+        button:hover{ 
+            transform: scale(1.1); 
+        }
+        h1{
+             font-weight: 500;
+             font-size:30px;
+             font-family: sans-serif;
+        }
+        p{
+             font-family: sans-serif;
+             font-size: 20px;
+             font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <h1 align="center">Word To ASCII Art</h1>
+    <p align="center">Convert your word to ASCII art</p>
+    <form action="/" method="post">
+        <div class="container">
+
+       <div class="group">
+        <label>Enter your word here: </label>
+        <input type="text" name="word">
+       </div>
+   
+        <button type="submit">Draw</button>
+    </form>
+ 
+</div>
+<p align="center">Your ASCII Art:</p>
+<div class="result">
+    <pre>{{ word }}</pre> 
+</div>
+
+</body>
+</html>
+// Backend logic
+
+from flask import Flask, request, render_template
+from pyfiglet import Figlet  # Correctly import Figlet from pyfiglet
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def word_to_art():
+    word = ""
+    if request.method == 'POST':
+        try:
+            given_word = request.form['word']
+            figlet = Figlet()  # Create a Figlet object
+            word = figlet.renderText(given_word)  # Render text using pyfiglet
+        except ValueError:
+            word = "Enter a valid word!"
+    return render_template('HTML FORM VIEW LINK', word=word)
+
+if __name__ == '__main__':
+    app.run(debug=True)
