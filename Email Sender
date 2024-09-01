@@ -1,0 +1,132 @@
+//Note:In this file both frontend and backend logic is included
+//HTML form view 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Sender</title>
+    <style>
+        body{
+             background-color: rgb(206, 230, 252);
+        }
+        .container{
+             width:500px;
+             height: 500px;
+             border-radius: 10px;
+             background-color: white;
+        }
+       .tag{
+           width:500px;
+           height: 40px;
+           background-color: rgb(179, 220, 255);
+           border-top-left-radius: 10px;
+           border-top-right-radius: 10px;
+       }
+       input[type="email"] {
+            border: none;
+            border-bottom: 2px solid black;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="email"]:focus {
+            outline: none;
+            border-bottom: 2px solid blue; /* Optional: Change border color on focus */
+        }
+        label[for="email"]{
+             font-size: 20px;
+             font-family: sans-serif; 
+        }
+        .tag h1{
+             font-size: 20px;
+             font-family: sans-serif;
+             margin-top: 10px;
+             margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+   
+    <div class="container">
+    <form action="/send_email" method="post" enctype="multipart/form-data">
+        <div class="tag">
+            <h1>New Message</h1>
+        </div>
+        <label for="email">To</label>
+        <input type="email" id="receiver_email" name="receiver_email" required><br><br>
+        
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required><br><br>
+        
+        <label for="message">Message:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+        
+        <label for="file">Attach file:</label>
+        <input type="file" id="file" name="file"><br><br>
+        
+        <input type="submit" value="Send Email">
+    </form>
+</div>
+</body>
+</html>
+// Backend Logic 
+from flask import Flask, render_template, request, jsonify
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+import os
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
+
+@app.route('/')
+def index():
+    return render_template('HTML FORM VIEW LINK')
+
+@app.route('/send_email', methods=['POST'])
+def send_email():
+    sender_email = ''  # Enter your email address
+    sender_password = ''  # Enter your email password
+
+    receiver_email = request.form['receiver_email']
+    subject = request.form['subject']
+    message = request.form['message']
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(message, 'plain'))
+
+    # Handle file attachment
+    files = request.files.getlist('file')
+    for file in files:
+        if file.filename != '':
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            file.save(file_path)
+
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(open(file_path, 'rb').read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', f'attachment; filename="{file.filename}"')
+
+            msg.attach(part)
+
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.quit()
+        return jsonify({'status': 'success', 'message': 'Email sent successfully!'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+if __name__ == '__main__':
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+    app.run(debug=True)
