@@ -1,0 +1,263 @@
+//Note:In this file both frontend and backend logic is included
+//HTML form view 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Creator</title>
+    <style>
+        body{
+             background-color: aliceblue;
+        }
+        .container{
+           width:62%;
+             height: 170px;
+             border-radius: 10px;
+             border: 2px solid black;
+             margin-left: 230px;
+             background-color: burlywood;
+        }
+        label{
+             font-size: 20px;
+             font-family: sans-serif;
+           
+        }
+        .functions{
+             padding: 5px;
+             padding-left: 40px;
+        }
+        .option{
+             padding: 10px;
+        }
+        input{
+            margin-bottom: 10px;
+            border: none;
+            border-bottom: 2px solid black;
+            background-color: burlywood;
+        }
+        select{
+            width: 150px;
+            height: 30px;
+            border-radius: 5px;
+            margin-left: 10px;
+            background-color: burlywood;
+            border: 1px solid black;
+
+        }
+
+        p{
+             font-size: 20px;
+             font-family: sans-serif;
+        }
+        h1{
+             font-size: 30px;
+             font-family: sans-serif;
+        }
+        button{
+             width:100px;
+             height: 20px;
+             font-size:15px;
+             cursor: pointer;
+             border: none;
+             border-radius: 5px;
+             background-color: brown;
+             margin-left: 20px;
+        }
+        img{
+             margin-left: 400px;
+             background-color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 align="center">Shape Creator</h1>
+    <div class="container">
+
+   
+    <form method="post">
+        <div class="option">
+
+      
+        <label for="shape">Choose a shape:</label>
+        <select name="shape" id="shape" onchange="updateInputFields()">
+            <option value="notselect" >Not Selected</option>
+            <option value="circle">Circle</option>
+            <option value="triangle">Triangle</option>
+            <option value="square">Square</option>
+            <option value="rectangle">Rectangle</option>
+            <!-- Add other shapes as needed -->
+        </select>
+    </div>
+       <div class="functions">
+
+       
+        <div id="notInputs"><p align="center">Select your shape type</p></div>
+
+        <div id="circleInputs" style="display: none;">
+            <label for="circle">Circle:</label><br>
+            <label for="radius" style="margin-right: 10px;">Enter Radius:</label>
+            <input type="number" id="radius" name="radius">
+        </div>
+
+        <div id="triangleInputs" style="display: none;">
+            <label for="triangle">Triangle:</label><br>
+    <label for="base" style="margin-right: 10px;">Enter Base (cm):</label>
+    <input type="number" id="base" name="base" style="margin-right: 10px;">
+    <label for="height" style="margin-right: 10px;">Enter Height (cm):</label>
+    <input type="number" id="height" name="height">
+        </div>
+        <div id="squareInputs" style="display: none;">
+            <label for="square" >Square:</label><br>
+            <label for="side1" style="margin-right: 10px;">Enter Side1 (m):</label>
+            <input type="number" id="side1" name="side1" style="margin-right: 10px;">
+            <label for="side2" style="margin-right: 10px;">Enter Side2 (m):</label>
+            <input type="number" id="side2" name="side2">
+        </div>
+        <div id="rectangleInputs" style="display: none;">
+            <label for="rectangle" >Rectangle:</label><br>
+            <label for="length" style="margin-right: 10px;">Enter Length (sqcm):</label>
+            <input type="number" id="length" name="length" style="margin-right: 10px;">
+            <label for="width" style="margin-right: 10px;">Enter Width (sqcm):</label>
+            <input type="number" id="width" name="width">
+        </div>
+    </div>
+
+        <button type="submit">Draw</button>
+    </form>
+    </div>
+
+    {% if image_url %}
+    <img src="{{ image_url }}" alt="Shape Image">
+    {% endif %}
+
+    <script>
+        function updateInputFields() {
+            var shape = document.getElementById('shape').value;
+            var notInputs = document.getElementById('notInputs');
+            var circleInputs = document.getElementById('circleInputs');
+            var triangleInputs = document.getElementById('triangleInputs');
+            var squareInputs = document.getElementById('squareInputs');
+            var rectangleInputs = document.getElementById('rectangleInputs');
+
+            if (shape == 'notselect') {
+                notInputs.style.display = '';
+                circleInputs.style.display = 'none';
+                triangleInputs.style.display = 'none';
+                squareInputs.style.display = 'none';
+                rectangleInputs.style.display = 'none';
+            } else if (shape === 'circle') {
+                notInputs.style.display = 'none';
+                circleInputs.style.display = '';
+                triangleInputs.style.display = 'none';
+                squareInputs.style.display = 'none';
+                rectangleInputs.style.display = 'none';
+            } else if (shape === 'triangle') {
+                notInputs.style.display = 'none';
+                circleInputs.style.display = 'none';
+                triangleInputs.style.display = '';
+                squareInputs.style.display = 'none';
+                rectangleInputs.style.display = 'none';
+            } else if (shape === 'square') {
+                notInputs.style.display = 'none';
+                circleInputs.style.display = 'none';
+                triangleInputs.style.display = 'none';
+                squareInputs.style.display = '';
+                rectangleInputs.style.display = 'none';
+            } else if (shape === 'rectangle') {
+                notInputs.style.display = 'none';
+                circleInputs.style.display = 'none';
+                triangleInputs.style.display = 'none';
+                squareInputs.style.display = 'none';
+                rectangleInputs.style.display = '';
+            }
+        }
+    </script>
+</body>
+
+</html>
+// Backend logic
+from flask import Flask, render_template, request, url_for
+from PIL import Image, ImageDraw
+import os
+import uuid
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    image_url = None
+    if request.method == 'POST':
+        shape = request.form.get('shape')
+        if shape == 'circle':
+            radius = int(request.form.get('radius'))
+            filename = draw_shape(shape, radius=radius)
+        elif shape == 'triangle':
+            base = int(request.form.get('base'))
+            height = int(request.form.get('height'))
+            filename = draw_shape(shape, base=base, height=height)
+        elif shape == 'square':
+            side1 = int(request.form.get('side1'))
+            side2 = int(request.form.get('side2'))
+            filename = draw_shape(shape, side1=side1, side2=side2)
+        elif shape == 'rectangle':
+            length = int(request.form.get('length'))
+            width = int(request.form.get('width'))
+            filename = draw_shape(shape, length=length, width=width)
+        image_url = url_for('static', filename=filename)
+        return render_template('YOUR HTML FORM VIEW LINK', image_url=image_url)
+    return render_template('32day.html')
+
+def draw_shape(shape, radius=None, base=None, height=None, side1=None, side2=None, length=None, width=None):
+    image = Image.new('RGB', (500, 500), 'aliceblue')
+    draw = ImageDraw.Draw(image)
+
+    cx, cy = 250, 250  # Center of the canvas
+
+    if shape == 'circle':
+        bounding_box = [cx - radius, cy - radius, cx + radius, cy + radius]
+        draw.ellipse(bounding_box, outline='black')
+
+    elif shape == 'triangle':
+        # Vertices calculation based on center, base, and height
+        v1 = (cx - base/2, cy + height/2)  # Bottom left vertex
+        v2 = (cx + base/2, cy + height/2)  # Bottom right vertex
+        v3 = (cx, cy - height/2)           # Top vertex
+
+        # Draw the triangle
+        draw.polygon([v1, v2, v3], outline='black')
+
+    elif shape == 'square':
+        # Calculate vertices based on center and side lengths
+        half_side1 = side1 / 2
+        half_side2 = side2 / 2
+        v1 = (cx - half_side1, cy - half_side2)  # Top left vertex
+        v2 = (cx + half_side1, cy - half_side2)  # Top right vertex
+        v3 = (cx + half_side1, cy + half_side2)  # Bottom right vertex
+        v4 = (cx - half_side1, cy + half_side2)  # Bottom left vertex
+
+        # Draw the square
+        draw.polygon([v1, v2, v3, v4], outline='black')
+
+    elif shape == 'rectangle':
+        # Calculate vertices based on center, length, and width
+        half_length = length / 2
+        half_width = width / 2
+        v1 = (cx - half_length, cy - half_width)  # Top left vertex
+        v2 = (cx + half_length, cy - half_width)  # Top right vertex
+        v3 = (cx + half_length, cy + half_width)  # Bottom right vertex
+        v4 = (cx - half_length, cy + half_width)  # Bottom left vertex
+
+        # Draw the rectangle
+        draw.polygon([v1, v2, v3, v4], outline='black')
+
+    # Save the image
+    filename = f"shape_{uuid.uuid4().hex}.png"
+    filepath = os.path.join('static', filename)
+    image.save(filepath)
+    return filename
+
+if __name__ == '__main__':
+    app.run(debug=True)
