@@ -90,11 +90,11 @@ app = Flask(__name__)
 
 # Establishing connection to the MySQL database
 mydb = mysql.connector.connect(
-    host="localhost",
-    port="3309",
-    user="root",
-    password="pass123",
-    database="Aditya_db",
+    host="YOUR_HOST",
+    port="YOUR_PORT",
+    user="",
+    password="",
+    database="YOUR_DATABASE",
     auth_plugin='mysql_native_password'
 )
 
@@ -106,7 +106,7 @@ def index():
             if students:
                 return render_template('25day.html', students=students)
             else:
-                return render_template('25day.html', error="No records found.")
+                return render_template('YOUR HTML FORM VIEW LINK', error="No records found.")
     # If the request is GET or no action is provided, render the initial form
     return render_template('25day.html')
 
